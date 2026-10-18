@@ -1,0 +1,47 @@
+MB-Spectral Contraction Theory: test on published accuracy-vs-compute data
+sources: NIE = arXiv:2605.07686 (Tabs 4,10,11,18,21); WANG = ICLR 2023 (Tab 6)
+curves: 8    points: 33
+
+P1  monotone non-decreasing accuracy (Theorem 1)
+  C1 Qwen3-8B no-think MATH-500         PASS
+  C2 Qwen3-8B think MATH-500            PASS
+  C3 Qwen3-8B no-think GSM8K            PASS
+  C4 Qwen3-8B think GSM8K               PASS
+  C5 R1-Distill-Llama-8B MATH-500       PASS
+  C6 R1-Distill-Llama-8B GSM8K          PASS
+  C7 UL2-20B self-consist. AQuA         PASS
+  C8 UL2-20B self-consist. MultiArith   PASS
+  -> 8/8 curves monotone
+
+P2  diminishing returns: accuracy concave (Theorem 4b); FAIL if max z > 2
+    slopes in points per 1k tokens (tok) or per path; z = slope rise / s.e.
+  C1 slopes   93.75   93.75   37.50    4.49   max z =  -0.00  PASS
+  C2 slopes    7.81   23.05   25.39   max z =   2.25  FAIL
+  C3 slopes  281.25  664.06  269.53   19.53   max z =   3.67  FAIL
+  C4 slopes  156.25  173.83   max z =   0.59  PASS
+  C5 slopes   11.52    4.30   max z =  -2.20  PASS
+  C6 slopes  155.08    8.20   max z = -18.97  PASS
+  C7 slopes    1.30    0.08    0.14    0.01   max z =   0.09  PASS
+  C8 slopes    0.45    0.20    0.14    0.05   max z =  -0.19  PASS
+  -> 6/8 curves concave within noise
+
+P3  model comparison, curves with >= 4 points (RMSE in accuracy points; mean s.e. for scale)
+    I = in-sample, L = leave-one-out, X = error predicting the last point from the others
+  id  n  mean-se |  I:SPEC   POW   LOG |  L:SPEC   POW   LOG |  X:SPEC   POW   LOG
+  C1 5    1.83  |   1.61   4.26   0.52  |   5.38  16.37   1.64  |   6.74   0.94   2.45
+  C2 4    1.48  |   2.70   7.00   1.19  |   7.17  18.24   3.65  |  10.77  21.69   6.63
+  C3 5    2.18  |   5.65  13.38   1.08  |  15.36  50.66   1.71  |   4.04  12.48   1.94
+  C7 5    1.68  |   0.43   0.25   0.26  |   2.10   1.34   4.03  |   0.66   0.08   0.06
+  C8 5    0.88  |   0.12   0.24   0.27  |   0.39   0.56   0.55  |   0.44   0.38   0.48
+
+  mean leave-one-out RMSE:  SPEC 6.08   POW 17.43   LOG 2.32
+  curves where model has the lowest leave-one-out RMSE:  SPEC 1   POW 1   LOG 3
+
+SPEC parameters (a_inf in %, g in 1/ktok or 1/path; 1/g = e-folding compute)
+  C1  a_inf =   66.1   g =   2.315   1/g =    0.432 ktok
+  C2  a_inf =  100.0   g =   0.297   1/g =    3.364 ktok
+  C3  a_inf =   99.5   g =   8.213   1/g =    0.122 ktok
+  C7  a_inf =   26.6   g =   0.298   1/g =    3.351 path
+  C8  a_inf =   14.9   g =   0.084   1/g =   11.938 path
+
+saved: fig_published.pdf, published_data.csv
